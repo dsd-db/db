@@ -1,6 +1,6 @@
 import sqlite3
 
-from db.__config import DB_ADMIN,DEFAULE_USERNAME,DEFAULT_PASSWORD
+from db.__config import DB_ADMIN,DEFAULT_USERNAME,DEFAULT_PASSWORD
 
 USERNAME='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
 # PASSWORD='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
@@ -33,7 +33,7 @@ def add(username:str,password:str)->bool:
     con.commit()
     return True
 
-add(DEFAULE_USERNAME,DEFAULT_PASSWORD)
+add(DEFAULT_USERNAME,DEFAULT_PASSWORD)
 
 def check(username:str,password:str)->bool:
     cur.execute('select password from admin where username=?',(username,))
