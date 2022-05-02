@@ -21,6 +21,9 @@ DB_ADMIN=os.path.join(DIR,DB_ADMIN)
 DB_DEVICE='device.db'
 DB_DEVICE=os.path.join(DIR,DB_DEVICE)
 
+DEFAULT_USERNAME='testadmin'
+DEFAULT_PASSWORD='testpwd114514@'
+
 os.makedirs(DEVICE,exist_ok=True)
 if not os.path.exists(BASE):
     open(BASE,'w').close()

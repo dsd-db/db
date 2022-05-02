@@ -1,9 +1,9 @@
 import sqlite3
 
-from db.__config import DB_ADMIN
+from db.__config import DB_ADMIN,DEFAULE_USERNAME,DEFAULT_PASSWORD
 
 USERNAME='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
-PASSWORD='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
+# PASSWORD='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~ '
 
 con=sqlite3.connect(DB_ADMIN,check_same_thread=False)
 cur=con.cursor()
@@ -26,14 +26,14 @@ def add(username:str,password:str)->bool:
         raise ValueError('password is too long')
     if not all(c in USERNAME for c in username):
         raise ValueError('username contains invalid characters')
-    if not all(c in PASSWORD for c in password):
+    if not all(0x1f<ord(c)<0x7f for c in password):
         raise ValueError('password contains invalid characters')
 
     cur.execute('insert into admin(username,email,password) values(?,?,?)',(username,None,password))
     con.commit()
     return True
 
-add('testadmin','testpwd114514@')
+add(DEFAULE_USERNAME,DEFAULT_PASSWORD)
 
 def check(username:str,password:str)->bool:
     cur.execute('select password from admin where username=?',(username,))

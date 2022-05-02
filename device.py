@@ -2,42 +2,13 @@ import os
 import shutil
 import sqlite3
 from uuid import UUID
+from typing import Union
 
 from db.__config import DB_DEVICE,MODEL,CALIBRATION
 con=sqlite3.connect(DB_DEVICE,check_same_thread=False)
 cur=con.cursor()
 cur.execute('create table if not exists device(uuid varchar(64) primary key,banned boolean,email varchar(1024),model varchar(1024),calibration varchar(1024))')
 con.commit()
-
-
-def get(uuid:str,create:bool=True):
-    uuid=str(uuid)
-    UUID(uuid,version=4)
-    cur.execute('select banned,email,model,calibration from device where uuid=?',(uuid,))
-    info=cur.fetchone()
-
-    if create and not info:
-        _model=MODEL%uuid
-        _calibration=CALIBRATION%uuid
-        cur.execute('insert into device(uuid,banned,email,model,calibration) values(?,?,?,?,?)',(uuid,False,None,_model,_calibration))
-        con.commit()
-        info=(0,None,_model,_calibration)
-        os.makedirs(_calibration)
-
-    if info:
-        return Device(uuid)
-    # else:
-    #     return None
-
-
-def remove(uuid:str)->None:
-    uuid=str(uuid)
-    UUID(uuid,version=4)
-    cur.execute('delete from device where uuid=?',(uuid,))
-    _dir=os.path.dirname(CALIBRATION%uuid)
-    if os.path.exists(_dir):
-        shutil.rmtree(_dir)
-    con.commit()
 
 
 class Device:
@@ -48,7 +19,7 @@ class Device:
         self._id=uuid
 
     @property
-    def id(self):
+    def id(self)->UUID:
         return UUID(self._id,version=4)
 
     @property
@@ -68,6 +39,8 @@ class Device:
 
     @email.setter
     def email(self,value:str)->None:
+        if len(value)>254:
+            raise ValueError('email is too long')
         cur.execute('update device set email=? where uuid=?',(value,self._id))
         con.commit()
 
@@ -84,8 +57,11 @@ class Device:
     def model(self,value:str)->None:
         cur.execute('select model from device where uuid=?',(self._id,))
         s=cur.fetchone()[0]
-        shutil.copyfile(value,s)
-
+        if value is None:
+            if os.path.exists(s):
+                os.remove(s)
+        else:
+            shutil.copyfile(value,s)
 
     @property
     def calibration(self)->str:
@@ -100,4 +76,37 @@ class Device:
     def calibration(self,value:str)->None:
         cur.execute('select calibration from device where uuid=?',(self._id,))
         s=cur.fetchone()[0]
-        shutil.copytree(value,s,dirs_exist_ok=True)
+        if value is None:
+            if os.listdir(s):
+                shutil.rmtree(s)
+        else:
+            shutil.copytree(value,s,dirs_exist_ok=True)
+
+
+def get(uuid:Union[str,UUID],create:bool=True)->Union[None,Device]:
+    uuid=UUID(str(uuid),version=4).hex
+    cur.execute('select banned,email,model,calibration from device where uuid=?',(uuid,))
+    info=cur.fetchone()
+
+    if create and not info:
+        _model=MODEL%uuid
+        _calibration=CALIBRATION%uuid
+        cur.execute('insert into device(uuid,banned,email,model,calibration) values(?,?,?,?,?)',(uuid,False,None,_model,_calibration))
+        con.commit()
+        info=(0,None,_model,_calibration)
+        os.makedirs(_calibration)
+
+    if info:
+        return Device(uuid)
+    # else:
+    #     return None
+
+
+def remove(uuid:Union[str,UUID])->None:
+    uuid=UUID(str(uuid),version=4).hex
+    cur.execute('delete from device where uuid=?',(uuid,))
+    _dir=os.path.dirname(CALIBRATION%uuid)
+    if os.path.exists(_dir):
+        shutil.rmtree(_dir)
+    con.commit()
+
