@@ -33,7 +33,7 @@ class Device:
         con.commit()
 
     @property
-    def email(self)->str:
+    def email(self)->Union[str,None]:
         cur.execute('select email from device where uuid=?',(self._id,))
         return cur.fetchone()[0]
 
@@ -45,7 +45,7 @@ class Device:
         con.commit()
 
     @property
-    def model(self)->str:
+    def model(self)->Union[str,None]:
         cur.execute('select model from device where uuid=?',(self._id,))
         s=cur.fetchone()[0]
         if os.path.exists(s):
@@ -64,10 +64,10 @@ class Device:
             shutil.copyfile(value,s)
 
     @property
-    def calibration(self)->str:
+    def calibration(self)->Union[str,None]:
         cur.execute('select calibration from device where uuid=?',(self._id,))
         s=cur.fetchone()[0]
-        if os.listdir(s):
+        if os.path.exists(s) and os.listdir(s):
             return s
         # else:
         #     return None
@@ -83,7 +83,7 @@ class Device:
             shutil.copytree(value,s,dirs_exist_ok=True)
 
 
-def get(uuid:Union[str,UUID],create:bool=True)->Union[None,Device]:
+def get(uuid:Union[str,UUID],create:bool=True)->Union[Device,None]:
     uuid=UUID(str(uuid),version=4).hex
     cur.execute('select banned,email,model,calibration from device where uuid=?',(uuid,))
     info=cur.fetchone()
