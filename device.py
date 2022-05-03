@@ -38,8 +38,8 @@ class Device:
         return cur.fetchone()[0]
 
     @email.setter
-    def email(self,value:str)->None:
-        if len(value)>254:
+    def email(self,value:Union[str,None])->None:
+        if value and len(value)>254:
             raise ValueError('email is too long')
         cur.execute('update device set email=? where uuid=?',(value,self._id))
         con.commit()
@@ -54,7 +54,7 @@ class Device:
         #     return None
 
     @model.setter
-    def model(self,value:str)->None:
+    def model(self,value:Union[str,None])->None:
         cur.execute('select model from device where uuid=?',(self._id,))
         s=cur.fetchone()[0]
         if value is None:
@@ -73,7 +73,7 @@ class Device:
         #     return None
 
     @calibration.setter
-    def calibration(self,value:str)->None:
+    def calibration(self,value:Union[str,None])->None:
         cur.execute('select calibration from device where uuid=?',(self._id,))
         s=cur.fetchone()[0]
         if value is None:
