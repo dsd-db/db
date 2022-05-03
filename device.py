@@ -77,7 +77,7 @@ class Device:
         cur.execute('select calibration from device where uuid=?',(self._id,))
         s=cur.fetchone()[0]
         if value is None:
-            if os.listdir(s):
+            if os.path.exists(s) and os.listdir(s):
                 shutil.rmtree(s)
         else:
             shutil.copytree(value,s,dirs_exist_ok=True)
