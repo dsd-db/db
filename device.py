@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 from uuid import UUID
 
@@ -9,9 +10,13 @@ class Model:
         self._id=uuid
 
     def __getitem__(self,key:str)->Union[str,None]:
+        if not re.match('^[a-z0-9]+(-[a-z0-9]+)*$',key):
+            raise ValueError('algo contains invalid characters')
         return e('select path from model where uuid=? and algo=?',(self._id,key,))
 
     def __setitem__(self,key:str,value:Union[str,None])->None:
+        if not re.match('^[a-z0-9]+(-[a-z0-9]+)*$',key):
+            raise ValueError('algo contains invalid characters')
         s=self[key]
         if value is None:
             if s is not None:
