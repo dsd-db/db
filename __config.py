@@ -1,38 +1,68 @@
 import os
+import sqlite3
+from typing import Union
 
-DIR='~/data/'
-DIR=os.path.abspath(os.path.expanduser(DIR))
+DIR=os.getenv('DSD_DATABASE')
 
-BASE='base.mdl'
-BASE=os.path.join(DIR,BASE)
+if DIR is None:
+    DIR='./.data'
+
+DIR=os.path.abspath(DIR)
 
 DEVICE='device'
 DEVICE=os.path.join(DIR,DEVICE)
 
-MODEL='device.mdl'
+MODEL='%s.mdl'
 MODEL=os.path.join(DEVICE,'%s',MODEL)
 
 CALIBRATION='calibration'
 CALIBRATION=os.path.join(DEVICE,'%s',CALIBRATION)
 
-DB_ADMIN='admin.db'
-DB_ADMIN=os.path.join(DIR,DB_ADMIN)
-
-DB_DEVICE='device.db'
-DB_DEVICE=os.path.join(DIR,DB_DEVICE)
-
-DEFAULT_USERNAME='testadmin'
-DEFAULT_PASSWORD='testpwd114514@'
+DB='main.db'
+DB=os.path.join(DIR,DB)
 
 os.makedirs(DEVICE,exist_ok=True)
-if not os.path.exists(BASE):
-    open(BASE,'w').close()
+
+con=sqlite3.connect(DB,check_same_thread=False)
+# con.set_trace_callback(print)
+
+con.execute('''
+    create table if not exists admin(
+        username varchar(64) primary key not null,
+        email varchar(256),
+        password varchar(64) not null
+    );
+''')
+con.commit()
+
+con.execute('''
+    create table if not exists device(
+        uuid varchar(64) primary key not null,
+        email varchar(256),
+        calibration varchar(256)
+    );
+''')
+con.commit()
+
+con.execute('''
+    create table if not exists model(
+        uuid varchar(64) not null,
+        name varchar(64),
+        path varchar(256),
+        primary key(uuid,name),
+        foreign key(uuid) references device(uuid)
+    );
+''')
+con.commit()
+
+def e(s:str,t:tuple)->Union[tuple,None]:
+    s=con.execute(s,t).fetchone()
+    con.commit()
+    return s
 
 if __name__=='__main__':
     print(DIR)
-    print(BASE)
     print(DEVICE)
     print(MODEL)
     print(CALIBRATION)
-    print(DB_ADMIN)
-    print(DB_DEVICE)
+    print(DB)

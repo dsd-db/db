@@ -1,1 +1,8 @@
-from db import admin,device,model
+from db import admin,device
+
+DEFAULT_USERNAME='testadmin'
+DEFAULT_PASSWORD='testpwd114514@'
+admin.add(DEFAULT_USERNAME,DEFAULT_PASSWORD)
+
+BASE_UUID='00000000-0000-0000-0000-000000000000'
+device.get(BASE_UUID)
