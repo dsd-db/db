@@ -30,7 +30,7 @@ class Device:
 
     @property
     def id(self)->UUID:
-        return UUID(self._id,version=4)
+        return UUID(self._id)
 
     @property
     def email(self)->Union[str,None]:
@@ -65,11 +65,11 @@ class Device:
 
 
 def exists(devid:Union[str,UUID])->bool:
-    devid=UUID(str(devid),version=4).hex
+    devid=UUID(str(devid)).hex
     return e('select 1 from device where uuid=?',(devid,)) is not None
 
 def get(devid:Union[str,UUID])->Device:
-    devid=UUID(str(devid),version=4).hex
+    devid=UUID(str(devid)).hex
 
     if e('select 1 from device where uuid=?',(devid,)) is None:
         e('insert into device(uuid,email,calibration) values(?,?,?)',(devid,None,None))
@@ -78,7 +78,7 @@ def get(devid:Union[str,UUID])->Device:
 
 
 def remove(devid:Union[str,UUID])->None:
-    devid=UUID(str(devid),version=4).hex
+    devid=UUID(str(devid)).hex
     # s=Device(devid).calibration
     e('delete from device where uuid=?',(devid,))
     _dir=os.path.dirname(CALIBRATION%devid)
