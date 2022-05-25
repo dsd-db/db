@@ -71,7 +71,7 @@ def exists(devid:Union[str,UUID])->bool:
 def get(devid:Union[str,UUID])->Device:
     devid=UUID(str(devid),version=4).hex
 
-    if e('select email,calibration from device where uuid=?',(devid,)) is None:
+    if e('select 1 from device where uuid=?',(devid,)) is None:
         e('insert into device(uuid,email,calibration) values(?,?,?)',(devid,None,None))
 
     return Device(devid)
