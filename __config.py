@@ -47,7 +47,7 @@ con.commit()
 con.execute('''
     create table if not exists model(
         uuid varchar(64) not null,
-        name varchar(64),
+        algo varchar(64),
         path varchar(256),
         primary key(uuid,name),
         foreign key(uuid) references device(uuid)
