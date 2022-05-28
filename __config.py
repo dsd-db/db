@@ -26,39 +26,40 @@ os.makedirs(DEVICE,exist_ok=True)
 con=sqlite3.connect(DB,check_same_thread=False)
 # con.set_trace_callback(print)
 
-con.execute('''
+def e(s:str,t:tuple=tuple())->Union[tuple,None]:
+    if t:
+        s=con.execute(s,t).fetchone()
+    else:
+        s=con.execute(s).fetchone()
+    con.commit()
+    return s
+
+e('''
     create table if not exists admin(
         username varchar(64) primary key not null,
         email varchar(256),
         password varchar(64) not null
     );
 ''')
-con.commit()
 
-con.execute('''
+e('''
     create table if not exists device(
         uuid varchar(64) primary key not null,
         email varchar(256),
         calibration varchar(256)
     );
 ''')
-con.commit()
 
-con.execute('''
+e('''
     create table if not exists model(
         uuid varchar(64) not null,
         algo varchar(64),
         path varchar(256),
-        primary key(uuid,name),
+        primary key(uuid,algo),
         foreign key(uuid) references device(uuid)
     );
 ''')
-con.commit()
 
-def e(s:str,t:tuple)->Union[tuple,None]:
-    s=con.execute(s,t).fetchone()
-    con.commit()
-    return s
 
 if __name__=='__main__':
     print(DIR)
