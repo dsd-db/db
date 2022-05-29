@@ -1,4 +1,5 @@
 */temp/
 tempCodeRunnerFile.py
-*/__pychche__/
-__pychche__/
+*/__pycache__/
+__pycache__/
+.mypy_cache/

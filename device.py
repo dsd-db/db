@@ -39,7 +39,7 @@ class Device:
 
     @property
     def email(self)->Union[str,None]:
-        return e('select email from device where uuid=?',(self._id,))[0]
+        return e('select email from device where uuid=?',(self._id,))
 
     @email.setter
     def email(self,value:Union[str,None])->None:
@@ -53,7 +53,7 @@ class Device:
 
     @property
     def calibration(self)->Union[str,None]:
-        return e('select calibration from device where uuid=?',(self._id,))[0]
+        return e('select calibration from device where uuid=?',(self._id,))
 
     @calibration.setter
     def calibration(self,value:Union[str,None])->None:

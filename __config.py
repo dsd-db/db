@@ -26,13 +26,16 @@ os.makedirs(DEVICE,exist_ok=True)
 con=sqlite3.connect(DB,check_same_thread=False)
 # con.set_trace_callback(print)
 
-def e(s:str,t:tuple=tuple())->Union[tuple,None]:
+def e(s:str,t:tuple=tuple())->Union[str,None]:
     if t:
         s=con.execute(s,t).fetchone()
     else:
         s=con.execute(s).fetchone()
     con.commit()
-    return s
+    if s is None:
+        return None
+    else:
+        return s[0]
 
 e('''
     create table if not exists admin(
