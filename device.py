@@ -85,7 +85,7 @@ def get(devid:Union[str,UUID])->Device:
 
 def remove(devid:Union[str,UUID])->None:
     devid=UUID(str(devid)).hex
-    # s=Device(devid).calibration
     e('delete from device where uuid=?',(devid,))
+    e('delete from model where uuid=?',(devid,))
     _dir=os.path.dirname(CALIBRATION%devid)
     shutil.rmtree(_dir,ignore_errors=True)
