@@ -26,7 +26,7 @@ def check(username:str,password:str)->bool:
     s=e('select password from admin where username=?',(username,))
     if not s:
         return False
-    if s[0]!=password:
+    if s!=password:
         return False
     return True
 
