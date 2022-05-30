@@ -3,7 +3,7 @@ import re
 import shutil
 from uuid import UUID
 
-from db.__config import Union,e,MODEL,CALIBRATION,DEBUG
+from db.__config import Union,e,MODEL,CALIBRATION
 
 class Model:
     def __init__(self,uuid:str)->None:
@@ -15,8 +15,6 @@ class Model:
         return e('select path from model where uuid=? and algo=?',(self._id,key,))
 
     def __setitem__(self,key:str,value:Union[str,None])->None:
-        if DEBUG:
-            print("setitem",key,value)
         if not re.match('^[a-z0-9]+(-[a-z0-9]+)*$',key):
             raise ValueError('algo contains invalid characters')
         s=self[key]
@@ -28,6 +26,7 @@ class Model:
             _model=MODEL%(self._id,key,)
             if s is None:
                 e('insert into model(uuid,algo,path) values(?,?,?)',(self._id,key,_model,))
+            os.makedirs(os.path.dirname(_model),exist_ok=True)
             shutil.copyfile(value,_model)
 
 

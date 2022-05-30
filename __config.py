@@ -2,8 +2,6 @@ import os
 import sqlite3
 from typing import Union
 
-DEBUG=True
-
 DIR=os.getenv('DSD_DATABASE')
 
 if DIR is None:
